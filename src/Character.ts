@@ -2,7 +2,7 @@ import Archetype, { Mage } from './Archetypes';
 import Energy from './Energy';
 import Fighter from './Fighter';
 import Race, { Elf } from './Races';
-import getRandomInt from './utils';
+import getRandomInt, { upAttribute, damageCalculate } from './utils';
 
 export default class Character implements Fighter {
   private _maxLifePoints: number;
@@ -48,15 +48,53 @@ export default class Character implements Fighter {
     return this._lifePoints;
   }
 
-  get strength(): number {
-    return this._strength;
-  }
-
   get defense(): number {
     return this._defense;
   }
 
   get dexterity(): number {
     return this._dexterity;
+  }
+
+  get energy(): Energy {
+    return { ...this._energy };
+  }
+
+  get strength(): number {
+    return this._strength;
+  }
+
+  receiveDamage(attackPoints: number): number {
+    const damage = damageCalculate(attackPoints, this._defense);
+
+    if (this._lifePoints <= 0 || this._lifePoints - damage <= 0) {
+      this._lifePoints = -1;
+    } else {
+      this._lifePoints -= damage;
+    }
+    
+    return this._lifePoints;
+  }
+
+  attack(enemy: Fighter): void {
+    enemy.receiveDamage(this._strength);
+  }
+
+  levelUp(): void {
+    this._defense = upAttribute(this._defense);
+    this._dexterity = upAttribute(this._dexterity);
+    this._strength = upAttribute(this._strength);
+
+    const life = upAttribute(this._maxLifePoints);
+
+    if (life > this._race.maxLifePoints) {
+      this._maxLifePoints = this._race.maxLifePoints;
+      this._lifePoints = this._race.maxLifePoints;
+    } else {
+      this._maxLifePoints = life;
+      this._lifePoints = life;
+    }
+
+    this.energy.amount = 10;
   }
 }

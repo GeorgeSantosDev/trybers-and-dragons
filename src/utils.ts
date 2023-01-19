@@ -5,3 +5,12 @@ function getRandomInt(min: number, max: number) {
 }
 
 export default getRandomInt;
+
+export function damageCalculate(attackPoints: number, defense: number): number {
+  const damage = attackPoints - defense;
+  return damage > 0 ? damage : 1;
+}
+
+export function upAttribute(attribute: number): number {
+  return attribute + getRandomInt(1, 10); 
+}
